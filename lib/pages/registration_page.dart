@@ -44,7 +44,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       controller: _nameController,
                       label: "Full Name *",
                       icon: Icons.person,
-                      validator: (value) => value!.isEmpty ? "Имя не может быть пустым" : null,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Имя не может быть пустым";
+                        }
+                        if (value.trim().split(RegExp(r'\s+')).length < 2) {
+                          return "Минимум 2 слова";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
@@ -57,20 +65,33 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         if (!RegExp(r'^[0-9]+$').hasMatch(value)) return "Разрешены только цифры.";
                         return null;
                       },
-                      helperText: "Phone format: (XXX) XXX-XXXX",
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
                       controller: _emailController,
-                      label: "Email Address",
+                      label: "Email Address *",
                       icon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) return "Email не может быть пустым";
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return "Без @ нельзя";
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildMultilineTextField(
                       controller: _storyController,
-                      label: "История жизни",
-                      helperText: "Будьте кратки, это всего лишь демо.",
+                      label: "История жизни *",
+                      helperText: "Минимум 20 слов",
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Поле не может быть пустым";
+                        }
+                        if (value.trim().split(RegExp(r'\s+')).length < 20) {
+                          return "История жизни должна содержать хотя бы 20 слов";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 10),
                     _buildPasswordField(
@@ -142,7 +163,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     IconData? icon,
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
-    String? helperText,
   }) {
     return TextFormField(
       controller: controller,
@@ -151,7 +171,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
         labelText: label,
         prefixIcon: icon != null ? Icon(icon) : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        helperText: helperText,
       ),
       validator: validator,
     );
@@ -187,6 +206,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget _buildMultilineTextField({
     required TextEditingController controller,
     required String label,
+    String? Function(String?)? validator,
     String? helperText,
   }) {
     return TextFormField(
@@ -197,6 +217,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         helperText: helperText,
       ),
+      validator: validator,
     );
   }
 }
