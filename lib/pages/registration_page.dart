@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:registration_app/model/user.dart';
-import 'user_info_page.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({Key? key}) : super(key: key);
+  final void Function(User) onUserRegistered;
+
+  const RegistrationPage({Key? key, required this.onUserRegistered}) : super(key: key);
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -25,9 +27,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Register Form'),
+        title: Text('register_form'.tr()),
         backgroundColor: Colors.blue,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              final newLocale = context.locale.languageCode == 'en' ? const Locale('ru') : const Locale('en');
+              context.setLocale(newLocale);
+            },
+          )
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -42,14 +53,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   children: [
                     _buildTextField(
                       controller: _nameController,
-                      label: "Full Name *",
+                      label: "full_name".tr(),
                       icon: Icons.person,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Имя не может быть пустым";
+                          return "name_empty".tr();
                         }
                         if (value.trim().split(RegExp(r'\s+')).length < 2) {
-                          return "Минимум 2 слова";
+                          return "name_min_words".tr();
                         }
                         return null;
                       },
@@ -57,38 +68,38 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     const SizedBox(height: 10),
                     _buildTextField(
                       controller: _phoneController,
-                      label: "Phone Number *",
+                      label: "phone_number".tr(),
                       icon: Icons.phone,
                       keyboardType: TextInputType.phone,
                       validator: (value) {
-                        if (value!.isEmpty) return "Номер телефона не может быть пустым";
-                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) return "Разрешены только цифры.";
+                        if (value!.isEmpty) return "phone_empty".tr();
+                        if (!RegExp(r'^[0-9]+\$').hasMatch(value)) return "phone_invalid".tr();
                         return null;
                       },
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
                       controller: _emailController,
-                      label: "Email Address *",
+                      label: "email".tr(),
                       icon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) return "Email не может быть пустым";
-                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return "Без @ нельзя";
+                        if (value == null || value.trim().isEmpty) return "email_empty".tr();
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return "email_invalid".tr();
                         return null;
                       },
                     ),
                     const SizedBox(height: 10),
                     _buildMultilineTextField(
                       controller: _storyController,
-                      label: "История жизни *",
-                      helperText: "Минимум 20 слов",
+                      label: "life_story".tr(),
+                      helperText: "story_hint".tr(),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return "Поле не может быть пустым";
+                          return "story_empty".tr();
                         }
                         if (value.trim().split(RegExp(r'\s+')).length < 20) {
-                          return "История жизни должна содержать хотя бы 20 слов";
+                          return "story_min_words".tr();
                         }
                         return null;
                       },
@@ -96,7 +107,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     const SizedBox(height: 10),
                     _buildPasswordField(
                       controller: _passwordController,
-                      label: "Password *",
+                      label: "password".tr(),
                       obscureText: _obscurePassword,
                       onToggle: () {
                         setState(() {
@@ -107,7 +118,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     const SizedBox(height: 10),
                     _buildPasswordField(
                       controller: _confirmPasswordController,
-                      label: "Confirm Password *",
+                      label: "confirm_password".tr(),
                       obscureText: _obscureConfirmPassword,
                       onToggle: () {
                         setState(() {
@@ -115,8 +126,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         });
                       },
                       validator: (value) {
-                        if (value!.isEmpty) return "Подтвердите пароль";
-                        if (value != _passwordController.text) return "Пароли не совпадают";
+                        if (value!.isEmpty) return "confirm_empty".tr();
+                        if (value != _passwordController.text) return "passwords_no_match".tr();
                         return null;
                       },
                     ),
@@ -136,15 +147,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               email: _emailController.text,
                               story: _storyController.text,
                             );
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => UserInfoPage(userInfo: newUser),
-                              ),
-                            );
+                            widget.onUserRegistered(newUser);
                           }
                         },
-                        child: const Text("Submit Form", style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: Text("submit_form".tr(), style: const TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                     ),
                   ],
@@ -196,8 +202,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
       validator: validator ?? (value) {
-        if (value!.isEmpty) return "Пароль не может быть пустым";
-        if (value.length < 6) return "Пароль должен быть длиной не менее 6 символов.";
+        if (value!.isEmpty) return "password_empty".tr();
+        if (value.length < 6) return "password_short".tr();
         return null;
       },
     );

@@ -1,0 +1,23 @@
+{
+    "register_form": "Register Form",
+    "full_name": "Full Name *",
+    "phone_number": "Phone Number *",
+    "email": "Email Address *",
+    "life_story": "Life Story *",
+    "password": "Password *",
+    "confirm_password": "Confirm Password *",
+    "submit_form": "Submit Form",
+    "name_empty": "Name cannot be empty",
+    "name_min_words": "Minimum 2 words",
+    "phone_invalid": "Only digits allowed.",
+    "phone_empty": "Phone number cannot be empty",
+    "email_empty": "Email cannot be empty",
+    "email_invalid": "Must contain @",
+    "story_empty": "Story cannot be empty",
+    "story_min_words": "Story must have at least 20 words",
+    "password_empty": "Password cannot be empty",
+    "password_short": "Password must be at least 6 characters",
+    "confirm_empty": "Please confirm your password",
+    "passwords_no_match": "Passwords do not match",
+    "story_hint": "Minimum 20 words"
+  }
